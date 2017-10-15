@@ -77,10 +77,8 @@ public class Maze {
 		this.isPath = false;
 		
 		softReset();
-		direct[][] beforeSquarePath = squarePath;
 		
-		for(int i = 0; i < this.size*this.size && !stopped; i++){
-			beforeSquarePath = squarePath;
+		for(int i = 0; i < this.size*this.size; i++){
 			done = false;
 			for(int x = 0; x < this.size && !done; x++){
 				for(int y = 0; y < this.size && !done; y++){
@@ -129,43 +127,41 @@ public class Maze {
 					}
 				}
 			}
-			if(squarePath == beforeSquarePath){
-				stopped = true;
-			}
-		}
-		this.isPath = false;
-		if(done){
-			this.isPath = true;
-			int move = 0;
-			int x = end[0];
-			int y = end[1];
-			while(x != start[0] || y != start[1]){
-				this.colorT[x][y] = move;
-				this.inPath[x][y] = true;
-				if(this.squarePath[x][y] == direct.up){
-					y--;
-				} else if (this.squarePath[x][y] == direct.down){
-					y++;
-				} else if (this.squarePath[x][y] == direct.left){
-					x--;
-				} else if (this.squarePath[x][y] == direct.right){
-					x++;
-				} 
-				move++;
-			} this.colorT[x][y] = move;
-			
-			for(int ax = 0; ax < this.size; ax++){
-				for(int ay = 0; ay < this.size; ay++){
-					if(this.inPath[ax][ay]){
-						this.colorT[ax][ay] = (int) Math.round(Math.max(0, Math.min(this.colorT[ax][ay]*256/move, 255)));
-						if(saveImage){
-							img.setRGB(ax, ay, new Color((this.colorT[ax][ay]),0,(255-this.colorT[ax][ay])).getRGB());
+			if(done){
+				this.isPath = true;
+				int move = 0;
+				int x = end[0];
+				int y = end[1];
+				while(x != start[0] || y != start[1]){
+					this.colorT[x][y] = move;
+					this.inPath[x][y] = true;
+					if(this.squarePath[x][y] == direct.up){
+						y--;
+					} else if (this.squarePath[x][y] == direct.down){
+						y++;
+					} else if (this.squarePath[x][y] == direct.left){
+						x--;
+					} else if (this.squarePath[x][y] == direct.right){
+						x++;
+					} 
+					move++;
+				} //this.colorT[x][y] = move;
+				
+				for(int ax = 0; ax < this.size; ax++){
+					for(int ay = 0; ay < this.size; ay++){
+						if(this.inPath[ax][ay]){
+							this.colorT[ax][ay] = (int) Math.round(Math.max(0, Math.min(this.colorT[ax][ay]*256/move, 255)));
+							if(saveImage){
+								img.setRGB(ax, ay, new Color((this.colorT[ax][ay]),0,(255-this.colorT[ax][ay])).getRGB());
+							}
 						}
 					}
 				}
-			}
-			
-			return;
+				
+				return;
+		}
+		this.isPath = false;
+		
 		}
 		return;
 	}

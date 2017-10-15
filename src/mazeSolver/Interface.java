@@ -86,10 +86,10 @@ public class Interface extends JFrame{
 							   }
 						   }
 					   }
-					   maze.solve(true, temp);
+					   maze.solve(true, null);
 					   File outputfile = new File(saveName.getText() + " (SOLVED).png");
 					    try {
-							ImageIO.write(temp, "png", outputfile);
+							ImageIO.write(temp, saveName.getText() + "png", outputfile);
 						} catch (IOException q) {
 							// TODO Auto-generated catch block
 							q.printStackTrace();
@@ -311,6 +311,7 @@ public class Interface extends JFrame{
 		    }
 		    
 		    maze.walls = new boolean[(int) Math.sqrt(temp.length)][(int) Math.sqrt(temp.length)];
+		    maze.size = (int) Math.sqrt(temp.length);
 		    size.setText(String.valueOf((int) Math.sqrt(temp.length)));
 		    for(int i = 0; i < Math.sqrt(temp.length); i++){
 				for(int ii = 0; ii < Math.sqrt(temp.length); ii++){

@@ -379,15 +379,13 @@ public class Interface extends JFrame{
 				} catch (ArrayIndexOutOfBoundsException e){boardImage.setRGB(x, y, grey2.getRGB());}
 			}
 		}
-		outImage.setPreferredSize(new Dimension(imageSize, imageSize));
 		outImage.setIcon(new ImageIcon(boardImage));
-		outImage.revalidate();
-		outImage.repaint();
-		outImage.update(outImage.getGraphics());
 	}
 	
 	public void importImage(){
-	    size.setText(String.valueOf((int) Math.sqrt(this.tempImage.getWidth())));
+	    size.setText(String.valueOf(this.tempImage.getWidth()));
+	    hold = holding.none;
+	    maze.reset();
 		if(this.tempImage.getHeight() <= this.imageSize && this.tempImage.getWidth() <= this.imageSize){
 			maze.size = Math.max(this.tempImage.getWidth(), this.tempImage.getHeight());
 			maze.reset();

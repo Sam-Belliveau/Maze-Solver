@@ -78,14 +78,15 @@ public class Maze {
 		
 		softReset();
 		
-		for(int i = 0; i < this.size*this.size; i++){
+		while(!stopped){
 			done = false;
+			stopped = true;
 			for(int x = 0; x < this.size && !done; x++){
 				for(int y = 0; y < this.size && !done; y++){
 					
 					if(!this.walls[x][y] && !this.isDud[x][y]){
 						if(this.squarePath[x][y] != direct.none || (x == this.start[0] && y == this.start[1])){
-							
+							stopped = false;
 							for(int pX = -1; pX < 2; pX+=2){
 								try{
 									if(this.squarePath[x+pX][y] == direct.none && !this.walls[x+pX][y]){

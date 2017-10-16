@@ -153,7 +153,11 @@ public class Maze {
 						if(this.inPath[ax][ay]){
 							this.colorT[ax][ay] = (int) Math.round(Math.max(0, Math.min(this.colorT[ax][ay]*256/move, 255)));
 							if(saveImage){
-								img.setRGB(ax, ay, new Color((this.colorT[ax][ay]),0,(255-this.colorT[ax][ay])).getRGB());
+								try{
+									img.setRGB(ax, ay, new Color((this.colorT[ax][ay]),0,(255-this.colorT[ax][ay])).getRGB());
+								} catch(Exception e){
+									
+								}
 							}
 						}
 					}

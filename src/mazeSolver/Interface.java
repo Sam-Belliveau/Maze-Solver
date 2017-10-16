@@ -10,12 +10,8 @@ import java.io.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-enum holding {none, start, end}
-
 @SuppressWarnings("serial")
 public class Interface extends JFrame{
-	
-	public holding hold = holding.none;
 	
 	public JLabel outImage = new JLabel();
 	
@@ -33,14 +29,18 @@ public class Interface extends JFrame{
 	public String font = "Calibri";
 
 	public JLabel sizeText = new JLabel("Grid Size:"), saveText = new JLabel("Board Name:"),
-			info = new JLabel("<html><b>HINT:</b><i> drag and drop images to input image mazes! Solved images are then saved</i></html>");
+			info = new JLabel("<html><b>HINT:</b><i> drag and drop images to input image mazes!</i></html>");
 	
 	public JTextField size = new JTextField(20), saveName = new JTextField("Maze Name");
 	
 	public JButton reset = new JButton("Reset Grid!"),
-			save = new JButton("Save Board!"), load = new JButton("Load Board!");;
+			save = new JButton("Save Board!"), load = new JButton("Load Board!");
+			
+	public JComboBox<String> draw = new JComboBox<String>();
 	
 	public int imageSize = 800;
+
+	protected boolean painting;
 	
 	public Interface(){
 		getContentPane().setBackground(new Color(240,240,240));
@@ -61,9 +61,7 @@ public class Interface extends JFrame{
 		solve.addActionListener(new ActionListener() {
 			   @Override
 			   public void actionPerformed(ActionEvent e) {
-				   if (hold == holding.none){
-					   maze.solve(false, null);
-				   }
+					maze.solve(false, null);
 
 					updateBoard();
 			   }
@@ -75,26 +73,24 @@ public class Interface extends JFrame{
 		solveNSave.addActionListener(new ActionListener() {
 			   @Override
 			   public void actionPerformed(ActionEvent e) {
-				   if (hold == holding.none){
-					   BufferedImage temp = new BufferedImage(maze.size, maze.size, BufferedImage.TYPE_INT_RGB);
-					   for(int x = 0; x < maze.size; x++){
-						   for(int y = 0; y < maze.size; y++){
-							   if(maze.walls[x][y]){
-								   temp.setRGB(x, y, Color.black.getRGB());
-							   } else {
-								   temp.setRGB(x, y, Color.white.getRGB());
-							   }
+				   BufferedImage temp = new BufferedImage(maze.size, maze.size, BufferedImage.TYPE_INT_RGB);
+				   for(int x = 0; x < maze.size; x++){
+					   for(int y = 0; y < maze.size; y++){
+						   if(maze.walls[x][y]){
+							   temp.setRGB(x, y, Color.black.getRGB());
+						   } else {
+							   temp.setRGB(x, y, Color.white.getRGB());
 						   }
 					   }
-					   maze.solve(true, null);
-					   File outputfile = new File(saveName.getText() + " (SOLVED).png");
-					    try {
-							ImageIO.write(temp, saveName.getText() + "png", outputfile);
-						} catch (IOException q) {
-							// TODO Auto-generated catch block
-							q.printStackTrace();
-						}
 				   }
+				   maze.solve(true, null);
+				   File outputfile = new File(saveName.getText() + " (SOLVED).png");
+				    try {
+						ImageIO.write(temp, saveName.getText() + "png", outputfile);
+					} catch (IOException q) {
+						// TODO Auto-generated catch block
+						q.printStackTrace();
+					}
 
 					updateBoard();
 			   }
@@ -129,22 +125,28 @@ public class Interface extends JFrame{
 			});
 		add(reset);
 		
-		info.setBounds(825, 375, 200, 125);
+		String[] options = {"Draw","Erase","Move Start", "Move End"};
+		draw = new JComboBox<String>(options);
+		draw.setBounds(825, 400, 200, 50);
+		draw.setFont(new Font(font, Font.BOLD, 28));
+		add(draw);
+		
+		info.setBounds(825, 450, 200, 125);
 		info.setFont(new Font(font, Font.ITALIC, 18));
 		info.setHorizontalAlignment(JLabel.CENTER);
 		add(info);
 		
-		saveText.setBounds(825, 525, 200, 50);
+		saveText.setBounds(825, 575, 200, 50);
 		saveText.setFont(new Font(font, Font.BOLD, 30));
 		saveText.setHorizontalAlignment(JLabel.CENTER);
 		add(saveText);
 		
-		saveName.setBounds(825, 575, 200, 50);
+		saveName.setBounds(825, 625, 200, 50);
 		saveName.setFont(new Font(font, Font.ITALIC, 24));
 		saveName.setText("World Name");
 		add(saveName);
 		
-		save.setBounds(825, 635, 200, 40);
+		save.setBounds(825, 685, 200, 40);
 		save.setFont(new Font(font, Font.BOLD, 20));
 		save.addActionListener(new ActionListener() {
 			   @Override
@@ -154,7 +156,7 @@ public class Interface extends JFrame{
 			   });
 		add(save);
 		
-		load.setBounds(825, 685, 200, 40);
+		load.setBounds(825, 735, 200, 40);
 		load.setFont(new Font(font, Font.BOLD, 20));
 		load.addActionListener(new ActionListener() {
 			   @Override
@@ -167,6 +169,7 @@ public class Interface extends JFrame{
 		setSize(1050,840);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setResizable(false);
+		
 		getContentPane().addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
             	int roundX = Math.round(e.getX()/((imageSize/maze.size)));
@@ -174,37 +177,75 @@ public class Interface extends JFrame{
                 try{
                 	@SuppressWarnings("unused")
 					boolean someBool = maze.walls[roundX][roundY]; // Out Of Bounds Check
-                	if(hold == holding.none){
-                		if(maze.start[0] == roundX && maze.start[1] == roundY){
-                			maze.start[0] = -1;
-                			maze.start[1] = -1;
-                			hold = holding.start;
-                		} else if (maze.end[0] == roundX && maze.end[1] == roundY){
-                			maze.end[0] = -1;
-                			maze.end[1] = -1;
-                			hold = holding.end;
-                		} else {
-                			maze.walls[roundX][roundY] = !maze.walls[roundX][roundY];
-                		}
-                	} else if (hold == holding.start){
-                		if(!(maze.end[0] == roundX && maze.end[1] == roundY)){
-                			maze.start[0] = roundX;
-                			maze.start[1] = roundY;
-                			hold = holding.none;
-                		}
-                	} else if (hold == holding.end){
-                		if(!(maze.start[0] == roundX && maze.start[1] == roundY)){
-                			maze.end[0] = roundX;
-                			maze.end[1] = roundY;
-                			hold = holding.none;
-                		}
+                	if(draw.getSelectedIndex() == 0){
+                		maze.walls[roundX][roundY] = true;
+                	} else if (draw.getSelectedIndex() == 1){
+                		maze.walls[roundX][roundY] = false;
+                	} else if (draw.getSelectedIndex() == 2){
+                		maze.start[0] = roundX;
+                		maze.start[1] = roundY;
+                	} else {
+                		maze.end[0] = roundX;
+                		maze.end[1] = roundY;
                 	}
             		maze.softReset();
                 	updateBoard();
                 } catch (ArrayIndexOutOfBoundsException a) {}
+                painting = true;
             }
-            
+
             public void mouseReleased(MouseEvent e) {
+                painting = false;
+            }
+        });
+		
+		getContentPane().addMouseMotionListener(new MouseMotionListener() {
+            public void mouseDragged(MouseEvent e) {
+            	if(painting){
+	            	int roundX = Math.round(e.getX()/((imageSize/maze.size)));
+	            	int roundY = Math.round(e.getY()/((imageSize/maze.size)));
+	                try{
+	                	@SuppressWarnings("unused")
+						boolean someBool = maze.walls[roundX][roundY]; // Out Of Bounds Check
+	                	if(draw.getSelectedIndex() == 0){
+	                		maze.walls[roundX][roundY] = true;
+	                	} else if (draw.getSelectedIndex() == 1){
+	                		maze.walls[roundX][roundY] = false;
+	                	} else if (draw.getSelectedIndex() == 2){
+	                		maze.start[0] = roundX;
+	                		maze.start[1] = roundY;
+	                	} else {
+	                		maze.end[0] = roundX;
+	                		maze.end[1] = roundY;
+	                	}
+	            		maze.softReset();
+	                	updateBoard();
+	                } catch (ArrayIndexOutOfBoundsException a) {}
+            	}
+            }
+
+            public void mouseMoved(MouseEvent e) {
+            	if(painting){
+	            	int roundX = Math.round(e.getX()/((imageSize/maze.size)));
+	            	int roundY = Math.round(e.getY()/((imageSize/maze.size)));
+	                try{
+	                	@SuppressWarnings("unused")
+						boolean someBool = maze.walls[roundX][roundY]; // Out Of Bounds Check
+	                	if(draw.getSelectedIndex() == 0){
+	                		maze.walls[roundX][roundY] = true;
+	                	} else if (draw.getSelectedIndex() == 1){
+	                		maze.walls[roundX][roundY] = false;
+	                	} else if (draw.getSelectedIndex() == 2){
+	                		maze.start[0] = roundX;
+	                		maze.start[1] = roundY;
+	                	} else {
+	                		maze.end[0] = roundX;
+	                		maze.end[1] = roundY;
+	                	}
+	            		maze.softReset();
+	                	updateBoard();
+	                } catch (ArrayIndexOutOfBoundsException a) {}
+            	}
             }
         });
 	}
@@ -233,7 +274,6 @@ public class Interface extends JFrame{
 	                    for (Object f : list) {
 	                      if (f instanceof File) {
 	                        File file = (File) f;
-	                        System.out.println(file);
                         	tempImage = (BufferedImage) ImageIO.read(file);
           	            	Iname = file.getName();
           	            	importImage();
@@ -332,6 +372,7 @@ public class Interface extends JFrame{
 	}
 
 	public void updateBoard(){
+		maze.softReset();
 		Color white = new Color(255, 255, 255);
 		Color blue = new Color(0, 0, 255);
 		Color red = new Color(255, 0, 0);
@@ -383,8 +424,8 @@ public class Interface extends JFrame{
 	}
 	
 	public void importImage(){
+		BufferedImage tempTempImage = this.tempImage;
 	    size.setText(String.valueOf(this.tempImage.getWidth()));
-	    hold = holding.none;
 	    maze.reset();
 		if(this.tempImage.getHeight() <= this.imageSize && this.tempImage.getWidth() <= this.imageSize){
 			maze.size = Math.max(this.tempImage.getWidth(), this.tempImage.getHeight());
@@ -396,7 +437,7 @@ public class Interface extends JFrame{
 					int g = (rgb >> 8) & 0xFF;
 					int b = (rgb & 0xFF);
 					int gray = (r + g + b) / 3;
-					if(gray < 128){
+					if(gray <= 128){
 						maze.walls[x][y] = true;
 					} else {
 						maze.walls[x][y] = false;
@@ -406,6 +447,7 @@ public class Interface extends JFrame{
 		} else {
 			maze.size = Math.max(this.tempImage.getWidth(), this.tempImage.getHeight());
 			maze.reset();
+		    this.tempImage = scaleImage(tempTempImage, 800, 800);
 			for(int x = 0; x < this.tempImage.getWidth(); x++){
 				for(int y = 0; y < this.tempImage.getHeight(); y++){
 					int rgb = this.tempImage.getRGB(x, y);
@@ -420,17 +462,20 @@ public class Interface extends JFrame{
 					}
 				}
 			}
-			maze.solve(true, this.tempImage);
-		    File outputfile = new File(this.Iname + " (SOLVED).png");
-		    try {
-				ImageIO.write(this.tempImage, "png", outputfile);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			maze.size = 20;
-			maze.reset();
+		    importImage();
 		} updateBoard();
+		this.tempImage = null;
+	}
+
+	
+	public BufferedImage scaleImage(BufferedImage before, int nW, int nH){
+		BufferedImage resized = new BufferedImage(nW, nH, before.getType());
+		Graphics2D g = resized.createGraphics();
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR); 
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.drawImage(before, 0, 0, nW, nH, 0, 0, before.getWidth(), before.getHeight(), null);
+		g.dispose();
+		return resized;
 	}
 	
 }

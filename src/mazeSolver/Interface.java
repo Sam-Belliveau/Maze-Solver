@@ -242,7 +242,6 @@ public class Interface extends JFrame{
 	          @Override public boolean importData(JComponent component, Transferable transferable) {
 	            try {
 	              for (DataFlavor flavor : transferable.getTransferDataFlavors()) {
-	                System.out.println(flavor);
 	                if (DataFlavor.imageFlavor.equals(flavor)) {
 	                  Object o = transferable.getTransferData(DataFlavor.imageFlavor);
 	                  if (o instanceof Image) {

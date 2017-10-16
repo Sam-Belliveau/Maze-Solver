@@ -19,6 +19,8 @@ public class Interface extends JFrame{
 	
 	public BufferedImage tempImage;
 	
+	public double ratio;
+	
 	public String Iname = "";
 	
 	public JButton solve = new JButton("Solve"),
@@ -45,7 +47,8 @@ public class Interface extends JFrame{
 	public Interface(){
 		getContentPane().setBackground(new Color(240,240,240));
 		maze.reset();
-		
+		ratio = (imageSize/maze.size);
+
 		setTitle("Maze Solver");
 		getContentPane().setLayout(null);
 		updateBoard();
@@ -119,6 +122,7 @@ public class Interface extends JFrame{
 					   	maze.size = 10;
 				   }
 				   
+				   ratio = (imageSize/maze.size);
 				   maze.reset();
 					updateBoard();
 			   }
@@ -175,8 +179,7 @@ public class Interface extends JFrame{
             	int roundX = Math.round(e.getX()/((imageSize/maze.size)));
             	int roundY = Math.round(e.getY()/((imageSize/maze.size)));
                 try{
-                	@SuppressWarnings("unused")
-					boolean someBool = maze.walls[roundX][roundY]; // Out Of Bounds Check
+                	maze.walls[roundX][roundY] = maze.walls[roundX][roundY]; // Out Of Bounds Check
                 	if(draw.getSelectedIndex() == 0){
                 		maze.walls[roundX][roundY] = true;
                 	} else if (draw.getSelectedIndex() == 1){
@@ -188,7 +191,7 @@ public class Interface extends JFrame{
                 		maze.end[0] = roundX;
                 		maze.end[1] = roundY;
                 	}
-            		maze.softReset();
+            		maze.resetPath();
                 	updateBoard();
                 } catch (ArrayIndexOutOfBoundsException a) {}
                 painting = true;
@@ -205,8 +208,7 @@ public class Interface extends JFrame{
 	            	int roundX = Math.round(e.getX()/((imageSize/maze.size)));
 	            	int roundY = Math.round(e.getY()/((imageSize/maze.size)));
 	                try{
-	                	@SuppressWarnings("unused")
-						boolean someBool = maze.walls[roundX][roundY]; // Out Of Bounds Check
+						maze.walls[roundX][roundY] = maze.walls[roundX][roundY]; // Out Of Bounds Check
 	                	if(draw.getSelectedIndex() == 0){
 	                		maze.walls[roundX][roundY] = true;
 	                	} else if (draw.getSelectedIndex() == 1){
@@ -218,35 +220,17 @@ public class Interface extends JFrame{
 	                		maze.end[0] = roundX;
 	                		maze.end[1] = roundY;
 	                	}
-	            		maze.softReset();
+	            		maze.resetPath();
 	                	updateBoard();
 	                } catch (ArrayIndexOutOfBoundsException a) {}
             	}
             }
 
-            public void mouseMoved(MouseEvent e) {
-            	if(painting){
-	            	int roundX = Math.round(e.getX()/((imageSize/maze.size)));
-	            	int roundY = Math.round(e.getY()/((imageSize/maze.size)));
-	                try{
-	                	@SuppressWarnings("unused")
-						boolean someBool = maze.walls[roundX][roundY]; // Out Of Bounds Check
-	                	if(draw.getSelectedIndex() == 0){
-	                		maze.walls[roundX][roundY] = true;
-	                	} else if (draw.getSelectedIndex() == 1){
-	                		maze.walls[roundX][roundY] = false;
-	                	} else if (draw.getSelectedIndex() == 2){
-	                		maze.start[0] = roundX;
-	                		maze.start[1] = roundY;
-	                	} else {
-	                		maze.end[0] = roundX;
-	                		maze.end[1] = roundY;
-	                	}
-	            		maze.softReset();
-	                	updateBoard();
-	                } catch (ArrayIndexOutOfBoundsException a) {}
-            	}
-            }
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
         });
 	}
 	
@@ -372,7 +356,6 @@ public class Interface extends JFrame{
 	}
 
 	public void updateBoard(){
-		maze.softReset();
 		Color white = new Color(255, 255, 255);
 		Color blue = new Color(0, 0, 255);
 		Color red = new Color(255, 0, 0);
@@ -445,9 +428,9 @@ public class Interface extends JFrame{
 				}
 			}
 		} else {
+		    this.tempImage = scaleImage(tempTempImage, 800, 800);
 			maze.size = Math.max(this.tempImage.getWidth(), this.tempImage.getHeight());
 			maze.reset();
-		    this.tempImage = scaleImage(tempTempImage, 800, 800);
 			for(int x = 0; x < this.tempImage.getWidth(); x++){
 				for(int y = 0; y < this.tempImage.getHeight(); y++){
 					int rgb = this.tempImage.getRGB(x, y);
@@ -462,7 +445,6 @@ public class Interface extends JFrame{
 					}
 				}
 			}
-		    importImage();
 		} updateBoard();
 		this.tempImage = null;
 	}

@@ -50,6 +50,11 @@ public class Maze {
 		}
 	}
 	
+	public void resetPath(){
+		this.isPath = false;
+		this.inPath = new boolean[this.size][this.size];
+	}
+	
 	public void softReset(){
 		this.isPath = false;
 		
@@ -61,12 +66,9 @@ public class Maze {
 		this.isDud = new boolean[this.size][this.size];
 		this.colorT = new int[this.size][this.size];
 		
-		for(int x = 0; x < this.size; x++){
-			for(int y = 0; y < this.size; y++){
-				this.colorT[x][y] = 0;
-				this.isDud[x][y] = false;
-				this.inPath[x][y] = false;
-				this.squarePath[x][y] = direct.none;
+		for(int i = 0; i < this.size; i++){
+			for(int ii = 0; ii < this.size; ii++){
+				this.squarePath[i][ii] = direct.none;
 			}
 		}
 	}
